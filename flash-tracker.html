@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flash Tracker - LoL</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: #0a0e1a;
+      color: #c8aa6e;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 30px 20px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      color: #c8aa6e;
+      border-bottom: 1px solid #785a28;
+      padding-bottom: 12px;
+      width: 100%;
+      max-width: 780px;
+      text-align: center;
+    }
+
+    .voice-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 780px;
+      margin-bottom: 20px;
+      background: #0d1526;
+      border: 1px solid #785a28;
+      border-radius: 8px;
+      padding: 10px 16px;
+    }
+
+    .mic-btn {
+      background: #1a2a4a;
+      border: 2px solid #3a5a8a;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+      flex-shrink: 0;
+    }
+    .mic-btn:hover { background: #243d6a; border-color: #7ec8e3; }
+    .mic-btn.listening {
+      background: #4a0a0a;
+      border-color: #e74c3c;
+      animation: pulse-mic 1s infinite;
+    }
+    @keyframes pulse-mic {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(231,76,60,0.5); }
+      50%       { box-shadow: 0 0 0 8px rgba(231,76,60,0); }
+    }
+
+    .voice-status { font-size: 0.82rem; color: #888; flex: 1; }
+    .voice-status span { color: #c8aa6e; font-style: italic; }
+    .voice-hint { font-size: 0.72rem; color: #555; text-align: right; white-space: nowrap; }
+
+    .board {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+      max-width: 780px;
+    }
+
+    .card {
+      background: #0d1526;
+      border: 1px solid #785a28;
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: border-color 0.3s;
+    }
+    .card.on-cd { border-color: #c0392b; }
+    .card.maybe { border-color: #e67e22; }
+    .card.ready { border-color: #27ae60; animation: pulse-green 0.6s ease; }
+
+    @keyframes pulse-green {
+      0%   { box-shadow: 0 0 0 0 rgba(39,174,96,0.6); }
+      70%  { box-shadow: 0 0 0 10px rgba(39,174,96,0); }
+      100% { box-shadow: 0 0 0 0 rgba(39,174,96,0); }
+    }
+
+    .slot-number {
+      font-size: 0.72rem;
+      font-weight: bold;
+      color: #785a28;
+      width: 62px;
+      flex-shrink: 0;
+      text-align: center;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .name-input {
+      background: #0a0e1a;
+      border: 1px solid #785a28;
+      border-radius: 5px;
+      color: #c8aa6e;
+      padding: 6px 10px;
+      font-size: 0.9rem;
+      width: 120px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .name-input:focus { border-color: #c8aa6e; }
+
+    .checkboxes {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .boots-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: #a0a0a0;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .boots-label input[type="checkbox"] {
+      accent-color: #c8aa6e;
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+    }
+
+    .flash-btn {
+      background: #1a2a4a;
+      border: 2px solid #3a5a8a;
+      border-radius: 6px;
+      color: #7ec8e3;
+      font-size: 0.85rem;
+      font-weight: bold;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .flash-btn:hover:not(:disabled) { background: #243d6a; border-color: #7ec8e3; }
+    .flash-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+
+    .clocks {
+      display: flex;
+      gap: 10px;
+      margin-left: auto;
+      align-items: center;
+    }
+
+    .clock-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 68px;
+    }
+
+    .clock-label {
+      font-size: 0.62rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+      color: #555;
+    }
+
+    .clock-time {
+      font-size: 1.3rem;
+      font-weight: bold;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 1px;
+    }
+    .clock-time.ticking-max { color: #e74c3c; }
+    .clock-time.ticking-min { color: #e67e22; }
+    .clock-time.done-min    { color: #e67e22; font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; }
+    .clock-time.up          { color: #2ecc71; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; }
+
+    .clock-divider {
+      width: 1px;
+      height: 36px;
+      background: #2a3a5a;
+    }
+
+    .reset-btn {
+      background: none;
+      border: 1px solid #555;
+      border-radius: 5px;
+      color: #888;
+      font-size: 0.75rem;
+      padding: 5px 9px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .reset-btn:hover { color: #c8aa6e; border-color: #c8aa6e; }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 0.75rem;
+      color: #444;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h1>⚡ Flash Tracker</h1>
+
+<div class="voice-bar">
+  <button class="mic-btn" id="mic-btn" title="Activar/desactivar voz">🎙️</button>
+  <div class="voice-status" id="voice-status">Voz desactivada — presiona el micrófono</div>
+  <div class="voice-hint">"flash top" · "mid" · "flash Jinx" · "reset adc"</div>
+</div>
+
+<div class="board" id="board"></div>
+
+<div class="footer">
+  Con CI = con Cosmic Insight (CD mínimo) &nbsp;·&nbsp; Sin CI = sin Cosmic Insight (CD máximo)
+</div>
+
+<script>
+  const BASE_CD   = 300;
+  const COSMIC_AH = 18;
+  const BOOTS_AH  = 12;
+
+  const ROLES = ['TOP', 'JUNGLA', 'MID', 'ADC', 'SOPORTE'];
+
+  const WORD_TO_NUM = {
+    'uno': 1, 'one': 1,
+    'dos': 2, 'two': 2,
+    'tres': 3, 'three': 3,
+    'cuatro': 4, 'four': 4,
+    'cinco': 5, 'five': 5,
+    'top': 1,
+    'jungla': 2, 'jungle': 2, 'jg': 2,
+    'mid': 3,
+    'adc': 4, 'bot': 4,
+    'support': 5, 'soporte': 5, 'supp': 5
+  };
+
+  const state = Array.from({ length: 5 }, () => ({
+    name: '',
+    ionicBoots: false,
+    cosmicInsight: false,
+    timerMax: null,
+    timerMin: null,
+    remainingMax: 0,
+    remainingMin: 0,
+    status: 'up'   // 'up' | 'cd' | 'maybe'
+  }));
+
+  function getCDMax(i) {
+    const ah = state[i].ionicBoots ? BOOTS_AH : 0;
+    return Math.round(BASE_CD / (1 + ah / 100));
+  }
+
+  function getCDMin(i) {
+    const ah = COSMIC_AH + (state[i].ionicBoots ? BOOTS_AH : 0);
+    return Math.round(BASE_CD / (1 + ah / 100));
+  }
+
+  function formatTime(s) {
+    return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
+  }
+
+  function startCD(i) {
+    if (state[i].timerMax) return;
+
+    state[i].remainingMax = getCDMax(i);
+    state[i].remainingMin = getCDMin(i);
+    state[i].status = 'cd';
+    updateCard(i);
+
+    state[i].timerMin = setInterval(() => {
+      state[i].remainingMin--;
+      if (state[i].remainingMin <= 0) {
+        clearInterval(state[i].timerMin);
+        state[i].timerMin = null;
+        state[i].remainingMin = 0;
+        if (state[i].status === 'cd') state[i].status = 'maybe';
+      }
+      updateCard(i);
+    }, 1000);
+
+    state[i].timerMax = setInterval(() => {
+      state[i].remainingMax--;
+      if (state[i].remainingMax <= 0) {
+        clearInterval(state[i].timerMax);
+        state[i].timerMax = null;
+        state[i].remainingMax = 0;
+        state[i].status = 'up';
+      }
+      updateCard(i);
+    }, 1000);
+  }
+
+  function resetCD(i) {
+    clearInterval(state[i].timerMax);
+    clearInterval(state[i].timerMin);
+    state[i].timerMax = null;
+    state[i].timerMin = null;
+    state[i].remainingMax = 0;
+    state[i].remainingMin = 0;
+    state[i].status = 'up';
+    updateCard(i);
+  }
+
+  function updateCard(i) {
+    const card     = document.getElementById(`card-${i}`);
+    const flashBtn = document.getElementById(`flash-btn-${i}`);
+    const resetBtn = document.getElementById(`reset-btn-${i}`);
+    const timeMax    = document.getElementById(`time-max-${i}`);
+    const timeMin    = document.getElementById(`time-min-${i}`);
+    const ciBox      = document.getElementById(`ci-box-${i}`);
+    const ciDivider  = document.getElementById(`ci-divider-${i}`);
+
+    // Show/hide CI clock
+    const showCI = state[i].cosmicInsight;
+    ciBox.style.display     = showCI ? '' : 'none';
+    ciDivider.style.display = showCI ? '' : 'none';
+
+    card.className = `card ${state[i].status}`;
+
+    if (state[i].status === 'up') {
+      timeMax.className = 'clock-time up';
+      timeMax.textContent = 'LISTO';
+      timeMin.className = 'clock-time up';
+      timeMin.textContent = 'LISTO';
+      flashBtn.disabled = false;
+      resetBtn.style.display = 'none';
+    } else if (state[i].status === 'maybe') {
+      timeMax.className = 'clock-time ticking-max';
+      timeMax.textContent = formatTime(state[i].remainingMax);
+      timeMin.className = 'clock-time done-min';
+      timeMin.textContent = '¿LISTO?';
+      flashBtn.disabled = true;
+      resetBtn.style.display = 'inline-block';
+    } else {
+      timeMax.className = 'clock-time ticking-max';
+      timeMax.textContent = formatTime(state[i].remainingMax);
+      timeMin.className = 'clock-time ticking-min';
+      timeMin.textContent = formatTime(state[i].remainingMin);
+      flashBtn.disabled = true;
+      resetBtn.style.display = 'inline-block';
+    }
+  }
+
+  // ── Voice ────────────────────────────────────────────────────────
+
+  function setVoiceStatus(text, highlight) {
+    const el = document.getElementById('voice-status');
+    el.innerHTML = highlight
+      ? `Escuché: <span>${highlight}</span> — ${text}`
+      : text;
+  }
+
+  function phonetic(str) {
+    return str
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/ph/g, 'f')
+      .replace(/qu/g, 'k')
+      .replace(/c([ei])/g, 's$1')
+      .replace(/c/g, 'k')
+      .replace(/z/g, 's')
+      .replace(/v/g, 'b')
+      .replace(/y/g, 'i')
+      .replace(/ll/g, 'i')
+      .replace(/h/g, '')
+      .replace(/(.)\1+/g, '$1')
+      .replace(/[^a-z0-9 ]/g, '');
+  }
+
+  function handleVoiceCommand(transcript) {
+    const raw = transcript.toLowerCase().trim();
+    setVoiceStatus('procesando...', raw);
+
+    const isReset = /\breset\b/.test(raw);
+    const isFlash = !isReset;
+
+    const targets = new Set();
+
+    for (const m of raw.matchAll(/\d+/g)) {
+      for (const ch of m[0]) {
+        const n = parseInt(ch);
+        if (n >= 1 && n <= 5) targets.add(n - 1);
+      }
+    }
+
+    const rawPhonetic = phonetic(raw);
+    for (const [word, num] of Object.entries(WORD_TO_NUM)) {
+      if (rawPhonetic.includes(phonetic(word))) targets.add(num - 1);
+    }
+
+    const cleaned = phonetic(raw.replace(/\bflash\b|\breset\b/g, '').trim());
+    const cleanedNoSpaces = cleaned.replace(/\s/g, '');
+    if (cleaned.length > 1) {
+      for (let i = 0; i < 5; i++) {
+        const name = phonetic(state[i].name.trim());
+        const nameNoSpaces = name.replace(/\s/g, '');
+        if (name && (cleaned.includes(name) || cleanedNoSpaces.includes(nameNoSpaces))) targets.add(i);
+      }
+    }
+
+    if (targets.size === 0) {
+      setVoiceStatus('no entendí el slot', raw);
+      return;
+    }
+
+    const labels = [...targets].map(i => ROLES[i]).join(', ');
+    if (isFlash) {
+      targets.forEach(i => startCD(i));
+      setVoiceStatus(`flash activado: ${labels}`, raw);
+    } else {
+      targets.forEach(i => resetCD(i));
+      setVoiceStatus(`reset: ${labels}`, raw);
+    }
+  }
+
+  let recognition = null;
+  let listening = false;
+
+  function setupVoice() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+      document.getElementById('mic-btn').disabled = true;
+      setVoiceStatus('Tu navegador no soporta reconocimiento de voz (usa Chrome/Edge)');
+      return;
+    }
+
+    recognition = new SR();
+    recognition.lang = 'es-ES';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    recognition.onresult = (e) => {
+      const transcript = e.results[e.results.length - 1][0].transcript;
+      handleVoiceCommand(transcript);
+    };
+
+    recognition.onerror = (e) => {
+      if (e.error === 'no-speech') return;
+      setVoiceStatus(`Error: ${e.error}`);
+    };
+
+    recognition.onend = () => { if (listening) recognition.start(); };
+
+    document.getElementById('mic-btn').addEventListener('click', () => {
+      if (!listening) {
+        listening = true;
+        recognition.start();
+        document.getElementById('mic-btn').classList.add('listening');
+        setVoiceStatus('Escuchando... di "flash top", "mid", "flash Jinx", "reset adc"');
+      } else {
+        listening = false;
+        recognition.stop();
+        document.getElementById('mic-btn').classList.remove('listening');
+        setVoiceStatus('Voz desactivada — presiona el micrófono');
+      }
+    });
+  }
+
+  // ── Board ────────────────────────────────────────────────────────
+
+  function buildBoard() {
+    const board = document.getElementById('board');
+    board.innerHTML = '';
+
+    for (let i = 0; i < 5; i++) {
+      const card = document.createElement('div');
+      card.className = 'card ready';
+      card.id = `card-${i}`;
+
+      card.innerHTML = `
+        <div class="slot-number">${ROLES[i]}</div>
+
+        <input class="name-input" type="text" placeholder="Campeón" id="name-${i}" maxlength="16" />
+
+        <div class="checkboxes">
+          <label class="boots-label">
+            <input type="checkbox" id="ib-${i}" /> Botas Jónicas
+          </label>
+          <label class="boots-label">
+            <input type="checkbox" id="ci-${i}" /> Cosmic Insight
+          </label>
+        </div>
+
+        <button class="flash-btn" id="flash-btn-${i}">⚡ Flash usado</button>
+
+        <div class="clocks">
+          <div class="clock-box" id="ci-box-${i}">
+            <div class="clock-label">Con CI</div>
+            <div class="clock-time up" id="time-min-${i}">LISTO</div>
+          </div>
+          <div class="clock-divider" id="ci-divider-${i}"></div>
+          <div class="clock-box">
+            <div class="clock-label">Sin CI</div>
+            <div class="clock-time up" id="time-max-${i}">LISTO</div>
+          </div>
+        </div>
+
+        <button class="reset-btn" id="reset-btn-${i}" style="display:none">Reset</button>
+      `;
+
+      board.appendChild(card);
+
+      document.getElementById(`flash-btn-${i}`).addEventListener('click', () => startCD(i));
+      document.getElementById(`reset-btn-${i}`).addEventListener('click', () => resetCD(i));
+      document.getElementById(`ib-${i}`).addEventListener('change', (e) => { state[i].ionicBoots = e.target.checked; });
+      document.getElementById(`ci-${i}`).addEventListener('change', (e) => { state[i].cosmicInsight = e.target.checked; updateCard(i); });
+      document.getElementById(`name-${i}`).addEventListener('input', (e) => { state[i].name = e.target.value; });
+      updateCard(i);
+    }
+  }
+
+  buildBoard();
+  setupVoice();
+</script>
+
+</body>
+</html>

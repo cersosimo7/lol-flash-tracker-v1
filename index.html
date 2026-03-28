@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Flash Tracker - LoL</title>
+  <title>Summoner Tracker - LoL</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -22,21 +22,42 @@
       font-size: 1.8rem;
       letter-spacing: 3px;
       text-transform: uppercase;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       color: #c8aa6e;
       border-bottom: 1px solid #785a28;
       padding-bottom: 12px;
       width: 100%;
-      max-width: 780px;
+      max-width: 860px;
       text-align: center;
     }
+
+    .lang-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .lang-btn {
+      background: #0d1526;
+      border: 1px solid #785a28;
+      border-radius: 5px;
+      color: #785a28;
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 5px 14px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .lang-btn:hover { border-color: #c8aa6e; color: #c8aa6e; }
+    .lang-btn.active { background: #785a28; color: #0a0e1a; border-color: #785a28; }
 
     .voice-bar {
       display: flex;
       align-items: center;
       gap: 12px;
       width: 100%;
-      max-width: 780px;
+      max-width: 860px;
       margin-bottom: 20px;
       background: #0d1526;
       border: 1px solid #785a28;
@@ -78,27 +99,23 @@
       flex-direction: column;
       gap: 14px;
       width: 100%;
-      max-width: 780px;
+      max-width: 860px;
     }
 
     .card {
       background: #0d1526;
       border: 1px solid #785a28;
       border-radius: 8px;
-      padding: 14px 18px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card-header {
       display: flex;
       align-items: center;
-      gap: 14px;
-      transition: border-color 0.3s;
-    }
-    .card.on-cd { border-color: #c0392b; }
-    .card.maybe { border-color: #e67e22; }
-    .card.ready { border-color: #27ae60; animation: pulse-green 0.6s ease; }
-
-    @keyframes pulse-green {
-      0%   { box-shadow: 0 0 0 0 rgba(39,174,96,0.6); }
-      70%  { box-shadow: 0 0 0 10px rgba(39,174,96,0); }
-      100% { box-shadow: 0 0 0 0 rgba(39,174,96,0); }
+      gap: 12px;
     }
 
     .slot-number {
@@ -112,11 +129,7 @@
       text-transform: uppercase;
       white-space: nowrap;
     }
-
-    .slot-num {
-      color: #4a7aaa;
-      font-size: 0.85rem;
-    }
+    .slot-num { color: #4a7aaa; font-size: 0.85rem; }
 
     .name-input {
       background: #0a0e1a;
@@ -125,7 +138,7 @@
       color: #c8aa6e;
       padding: 6px 10px;
       font-size: 0.9rem;
-      width: 120px;
+      width: 140px;
       outline: none;
       transition: border-color 0.2s;
     }
@@ -133,47 +146,94 @@
 
     .checkboxes {
       display: flex;
-      flex-direction: column;
-      gap: 5px;
+      gap: 14px;
+      margin-left: auto;
     }
 
-    .boots-label {
+    .check-label {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       color: #a0a0a0;
       cursor: pointer;
       white-space: nowrap;
     }
-    .boots-label input[type="checkbox"] {
+    .check-label input[type="checkbox"] {
       accent-color: #c8aa6e;
       width: 14px;
       height: 14px;
       cursor: pointer;
     }
 
-    .flash-btn {
+    .boots-sel {
+      background: #0a0e1a;
+      border: 1px solid #785a28;
+      border-radius: 4px;
+      color: #c8aa6e;
+      padding: 3px 5px;
+      font-size: 0.72rem;
+      outline: none;
+      cursor: pointer;
+    }
+    .boots-sel:focus { border-color: #c8aa6e; }
+
+    .spell-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      background: #080d1a;
+      border-left: 3px solid #27ae60;
+      transition: border-color 0.3s;
+    }
+    .spell-row.on-cd { border-left-color: #c0392b; }
+    .spell-row.maybe { border-left-color: #e67e22; }
+    .spell-row.up    { border-left-color: #27ae60; }
+
+    .spell-slot-label {
+      font-size: 0.7rem;
+      font-weight: bold;
+      color: #4a7aaa;
+      width: 12px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    .spell-select {
+      background: #0a0e1a;
+      border: 1px solid #785a28;
+      border-radius: 5px;
+      color: #c8aa6e;
+      padding: 5px 6px;
+      font-size: 0.82rem;
+      outline: none;
+      cursor: pointer;
+      width: 130px;
+      flex-shrink: 0;
+    }
+    .spell-select:focus { border-color: #c8aa6e; }
+
+    .spell-btn {
       background: #1a2a4a;
       border: 2px solid #3a5a8a;
       border-radius: 6px;
       color: #7ec8e3;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: bold;
-      padding: 8px 12px;
+      padding: 7px 11px;
       cursor: pointer;
       transition: background 0.2s, border-color 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
       white-space: nowrap;
+      flex-shrink: 0;
     }
-    .flash-btn:hover:not(:disabled) { background: #243d6a; border-color: #7ec8e3; }
-    .flash-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+    .spell-btn:hover:not(:disabled) { background: #243d6a; border-color: #7ec8e3; }
+    .spell-btn:disabled { cursor: not-allowed; opacity: 0.5; }
 
     .clocks {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       margin-left: auto;
       align-items: center;
     }
@@ -182,31 +242,32 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-width: 68px;
+      min-width: 62px;
     }
 
     .clock-label {
-      font-size: 0.62rem;
+      font-size: 0.58rem;
       letter-spacing: 1px;
       text-transform: uppercase;
-      margin-bottom: 2px;
+      margin-bottom: 1px;
       color: #555;
     }
 
     .clock-time {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: bold;
       font-variant-numeric: tabular-nums;
       letter-spacing: 1px;
     }
     .clock-time.ticking-max { color: #e74c3c; }
     .clock-time.ticking-min { color: #e67e22; }
-    .clock-time.done-min    { color: #e67e22; font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; }
-    .clock-time.up          { color: #2ecc71; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; }
+    .clock-time.done-min    { color: #e67e22; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; }
+    .clock-time.up          { color: #2ecc71; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
+    .clock-time.no-spell    { color: #333; font-size: 0.8rem; }
 
     .clock-divider {
       width: 1px;
-      height: 36px;
+      height: 32px;
       background: #2a3a5a;
     }
 
@@ -215,13 +276,21 @@
       border: 1px solid #555;
       border-radius: 5px;
       color: #888;
-      font-size: 0.75rem;
-      padding: 5px 9px;
+      font-size: 0.72rem;
+      padding: 5px 8px;
       cursor: pointer;
       transition: color 0.2s, border-color 0.2s;
       white-space: nowrap;
+      flex-shrink: 0;
     }
     .reset-btn:hover { color: #c8aa6e; border-color: #c8aa6e; }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 0.75rem;
+      color: #444;
+      text-align: center;
+    }
 
     .signature {
       margin-top: 10px;
@@ -231,235 +300,346 @@
       letter-spacing: 1px;
     }
 
-    .footer {
-      margin-top: 30px;
-      font-size: 0.75rem;
-      color: #444;
-      text-align: center;
-    }
-
     /* ── Mobile ─────────────────────────────────────────────────── */
     @media (max-width: 620px) {
       body { padding: 16px 10px; }
-
-      h1 { font-size: 1.3rem; letter-spacing: 2px; margin-bottom: 12px; }
-
+      h1 { font-size: 1.3rem; letter-spacing: 2px; margin-bottom: 10px; }
       .voice-hint { display: none; }
-
       .voice-bar { gap: 8px; padding: 8px 10px; }
       .voice-status { font-size: 0.76rem; }
-
       .board { gap: 10px; }
 
-      .card {
-        display: grid;
-        grid-template-columns: 80px 1fr auto auto;
-        grid-template-rows: auto auto;
-        column-gap: 8px;
-        row-gap: 8px;
-        padding: 10px 12px;
-        align-items: center;
-      }
+      .card { padding: 10px 12px; gap: 7px; }
 
-      .slot-number {
-        grid-area: 1 / 1 / 2 / 2;
-        width: auto;
-        text-align: left;
-        align-self: center;
-      }
+      .card-header { flex-wrap: wrap; gap: 8px; }
+      .name-input { flex: 1; min-width: 0; width: auto; }
+      .checkboxes { margin-left: 0; width: 100%; gap: 14px; }
 
-      .name-input {
-        grid-area: 1 / 2 / 2 / 3;
-        width: 100%;
-        min-width: 0;
-      }
+      .spell-row { gap: 6px; padding: 6px 8px; }
+      .spell-select { width: 100px; font-size: 0.76rem; }
+      .spell-btn { padding: 7px 8px; font-size: 0.74rem; }
 
-      .flash-btn {
-        grid-area: 1 / 3 / 2 / 5;
-        padding: 9px 10px;
-        font-size: 0.78rem;
-      }
+      .clock-box { min-width: 50px; }
+      .clock-time { font-size: 1rem; }
+      .clock-time.done-min { font-size: 0.68rem; }
+      .clock-time.up       { font-size: 0.72rem; }
 
-      .checkboxes {
-        grid-area: 2 / 1 / 3 / 3;
-        flex-direction: row;
-        gap: 10px;
-      }
-
-      .boots-label { font-size: 0.7rem; }
-
-      .clocks {
-        grid-area: 2 / 3 / 3 / 4;
-        margin-left: 0;
-        gap: 6px;
-      }
-
-      .clock-box { min-width: 52px; }
-      .clock-time { font-size: 1.1rem; }
-      .clock-time.done-min { font-size: 0.72rem; }
-      .clock-time.up       { font-size: 0.78rem; }
-
-      .reset-btn {
-        grid-area: 2 / 4 / 3 / 5;
-        align-self: center;
-        font-size: 0.68rem;
-        padding: 5px 7px;
-      }
-
+      .reset-btn { font-size: 0.65rem; padding: 5px 6px; }
       .footer { margin-top: 18px; font-size: 0.65rem; }
     }
   </style>
 </head>
 <body>
 
-<h1>⚡ Flash Tracker</h1>
+<h1>Summoner Tracker</h1>
+
+<div class="lang-bar">
+  <button class="lang-btn active" data-lang="es">ES</button>
+  <button class="lang-btn"        data-lang="en">EN</button>
+  <button class="lang-btn"        data-lang="pt">PT</button>
+</div>
 
 <div class="voice-bar">
-  <button class="mic-btn" id="mic-btn" title="Activar/desactivar voz">🎙️</button>
-  <div class="voice-status" id="voice-status">Voz desactivada — presiona el micrófono</div>
-  <div class="voice-hint">"flash top" · "mid" · "flash Jinx" · "reset adc"</div>
+  <button class="mic-btn" id="mic-btn" title="Mic">🎙️</button>
+  <div class="voice-status" id="voice-status"></div>
+  <div class="voice-hint"   id="voice-hint"></div>
 </div>
 
 <div class="board" id="board"></div>
 
-<div class="footer">
-  Con CI = con Cosmic Insight (CD mínimo) &nbsp;·&nbsp; Sin CI = sin Cosmic Insight (CD máximo)
-</div>
+<div class="footer"    id="footer"></div>
 <div class="signature">Brian Cersosimo - WELL PLAYED</div>
 
 <script>
-  const BASE_CD   = 300;
-  const COSMIC_AH = 18;
-  const BOOTS_AH  = 12;
+  // ── Constants ──────────────────────────────────────────────────────
+  const COSMIC_AH          = 18;
+  const BOOTS_AH           = 10;
+  const BOOTS_UPGRADED_AH  = 20;
+  const SPELL_ORDER = ['flash','ignite','exhaust','ghost','heal','barrier','cleanse','teleport','none'];
+  const SPELL_CD    = { flash:300, ignite:180, exhaust:210, ghost:210, heal:240, barrier:180, cleanse:210, teleport:300, none:0 };
 
-  const ROLES = ['TOP', 'JUNGLA', 'MID', 'ADC', 'SOPORTE'];
+  // ── Translations ────────────────────────────────────────────────────
+  const LANGS = {
+    es: {
+      speechLang: 'es-ES',
+      roles: ['TOP', 'JUNGLA', 'MID', 'ADC', 'SOPORTE'],
+      spells: {
+        flash:'Flash', ignite:'Incendiar', exhaust:'Agotar', ghost:'Espectro',
+        heal:'Curar', barrier:'Barrera', cleanse:'Purificar', teleport:'Teletransportar', none:'—',
+      },
+      voiceNums: {
+        'uno':1,'dos':2,'tres':3,'cuatro':4,'cinco':5,
+      },
+      voiceRoles: {
+        'top':1,'jungla':2,'jungle':2,'jg':2,'mid':3,'adc':4,'bot':4,'soporte':5,'support':5,'supp':5,
+      },
+      voiceSpells: {
+        'teletransportar':'teleport','teleport':'teleport','tele':'teleport','tp':'teleport',
+        'incendiar':'ignite','ignite':'ignite','igni':'ignite',
+        'purificar':'cleanse','cleanse':'cleanse',
+        'espectro':'ghost','ghost':'ghost',
+        'agotar':'exhaust','exhaust':'exhaust',
+        'barrera':'barrier','barrier':'barrier',
+        'flash':'flash','flas':'flash',
+        'curar':'heal','heal':'heal',
+      },
+      ui: {
+        spellBtn:        'Usado',
+        bootsNone:       'Sin botas',
+        bootsRegular:    'Jónicas (10)',
+        bootsUpgraded:   'Actualizadas (20)',
+        conCI:           'Con CI',
+        sinCI:           'Sin CI',
+        champPlaceholder:'Campeón',
+        ready:           'LISTO',
+        maybeReady:      '¿LISTO?',
+        footer:          'Con CI = con Cosmic Insight (CD mínimo) · Sin CI = sin Cosmic Insight (CD máximo)',
+        voiceOff:        'Voz desactivada — presiona el micrófono',
+        voiceHint:       '"flash top" · "incendiar 3" · "tp adc" · "reset espectro Jinx"',
+        voiceListening:  'Escuchando... "incendiar top", "espectro 3", "tp adc", "reset agotar Jinx"',
+        voiceProcessing: 'procesando...',
+        voiceNoSlot:     'no entendí el slot',
+        voiceNoSupport:  'Tu navegador no soporta reconocimiento de voz (usa Chrome/Edge)',
+        voiceUsed:       (spell, labels) => `${spell} usado: ${labels}`,
+        voiceReset:      (labels) => `reset: ${labels}`,
+        voiceError:      (err) => `Error: ${err}`,
+      },
+    },
 
-  const WORD_TO_NUM = {
-    'uno': 1, 'one': 1,
-    'dos': 2, 'two': 2,
-    'tres': 3, 'three': 3,
-    'cuatro': 4, 'four': 4,
-    'cinco': 5, 'five': 5,
-    'top': 1,
-    'jungla': 2, 'jungle': 2, 'jg': 2,
-    'mid': 3,
-    'adc': 4, 'bot': 4,
-    'support': 5, 'soporte': 5, 'supp': 5
+    en: {
+      speechLang: 'en-US',
+      roles: ['TOP', 'JUNGLE', 'MID', 'ADC', 'SUPPORT'],
+      spells: {
+        flash:'Flash', ignite:'Ignite', exhaust:'Exhaust', ghost:'Ghost',
+        heal:'Heal', barrier:'Barrier', cleanse:'Cleanse', teleport:'Teleport', none:'—',
+      },
+      voiceNums: {
+        'one':1,'two':2,'three':3,'four':4,'five':5,
+      },
+      voiceRoles: {
+        'top':1,'jungle':2,'jg':2,'mid':3,'adc':4,'bot':4,'support':5,'supp':5,
+      },
+      voiceSpells: {
+        'teleport':'teleport','tele':'teleport','tp':'teleport',
+        'ignite':'ignite',
+        'exhaust':'exhaust',
+        'cleanse':'cleanse',
+        'barrier':'barrier',
+        'ghost':'ghost',
+        'flash':'flash',
+        'heal':'heal',
+      },
+      ui: {
+        spellBtn:        'Used',
+        bootsNone:       'No boots',
+        bootsRegular:    'Ionian (10)',
+        bootsUpgraded:   'Upgraded (20)',
+        conCI:           'W/ CI',
+        sinCI:           'W/O CI',
+        champPlaceholder:'Champion',
+        ready:           'READY',
+        maybeReady:      'READY?',
+        footer:          'W/ CI = with Cosmic Insight (min CD) · W/O CI = without Cosmic Insight (max CD)',
+        voiceOff:        'Voice off — press the microphone',
+        voiceHint:       '"flash top" · "ignite 3" · "tp adc" · "reset exhaust Jinx"',
+        voiceListening:  'Listening... "ignite top", "ghost 3", "tp adc", "reset exhaust Jinx"',
+        voiceProcessing: 'processing...',
+        voiceNoSlot:     'could not understand the slot',
+        voiceNoSupport:  'Your browser does not support voice recognition (use Chrome/Edge)',
+        voiceUsed:       (spell, labels) => `${spell} used: ${labels}`,
+        voiceReset:      (labels) => `reset: ${labels}`,
+        voiceError:      (err) => `Error: ${err}`,
+      },
+    },
+
+    pt: {
+      speechLang: 'pt-BR',
+      roles: ['TOP', 'SELVA', 'MID', 'ADC', 'SUPORTE'],
+      spells: {
+        flash:'Flash', ignite:'Inflamar', exhaust:'Exaurir', ghost:'Espectro',
+        heal:'Curar', barrier:'Barreira', cleanse:'Purificar', teleport:'Teletransporte', none:'—',
+      },
+      voiceNums: {
+        'um':1,'dois':2,'tres':3,'quatro':4,'cinco':5,
+      },
+      voiceRoles: {
+        'top':1,'selva':2,'jungle':2,'jg':2,'mid':3,'adc':4,'bot':4,'suporte':5,'support':5,
+      },
+      voiceSpells: {
+        'teletransporte':'teleport','teleport':'teleport','tele':'teleport','tp':'teleport',
+        'inflamar':'ignite','ignite':'ignite',
+        'purificar':'cleanse','cleanse':'cleanse',
+        'espectro':'ghost','ghost':'ghost',
+        'exaurir':'exhaust','exhaust':'exhaust',
+        'barreira':'barrier','barrier':'barrier',
+        'flash':'flash','flas':'flash',
+        'curar':'heal','heal':'heal',
+      },
+      ui: {
+        spellBtn:        'Usado',
+        bootsNone:       'Sem botas',
+        bootsRegular:    'Jônicas (10)',
+        bootsUpgraded:   'Atualizadas (20)',
+        conCI:           'Com CI',
+        sinCI:           'Sem CI',
+        champPlaceholder:'Campeão',
+        ready:           'PRONTO',
+        maybeReady:      'PRONTO?',
+        footer:          'Com CI = com Cosmic Insight (CD mínimo) · Sem CI = sem Cosmic Insight (CD máximo)',
+        voiceOff:        'Voz desativada — pressione o microfone',
+        voiceHint:       '"flash top" · "inflamar 3" · "tp adc" · "reset espectro Jinx"',
+        voiceListening:  'Ouvindo... "inflamar top", "espectro 3", "tp adc", "reset exaurir Jinx"',
+        voiceProcessing: 'processando...',
+        voiceNoSlot:     'não entendi o slot',
+        voiceNoSupport:  'Seu navegador não suporta reconhecimento de voz (use Chrome/Edge)',
+        voiceUsed:       (spell, labels) => `${spell} usado: ${labels}`,
+        voiceReset:      (labels) => `reset: ${labels}`,
+        voiceError:      (err) => `Erro: ${err}`,
+      },
+    },
   };
 
+  let lang = 'es';
+  let T    = LANGS[lang];
+
+  // ── Spell regex (rebuilt on lang change) ───────────────────────────
+  let SPELL_STRIP_RE;
+  function buildSpellRE() {
+    SPELL_STRIP_RE = new RegExp(
+      `\\b(reset|${Object.keys(T.voiceSpells).sort((a,b) => b.length - a.length).join('|')})\\b`, 'g'
+    );
+  }
+  buildSpellRE();
+
+  // ── State ──────────────────────────────────────────────────────────
   const state = Array.from({ length: 5 }, () => ({
     name: '',
-    ionicBoots: false,
+    bootsAH: 0,
     cosmicInsight: false,
-    timerMax: null,
-    timerMin: null,
-    remainingMax: 0,
-    remainingMin: 0,
-    status: 'up'   // 'up' | 'cd' | 'maybe'
+    spells: [
+      { key: 'flash',  timerMax: null, timerMin: null, remainingMax: 0, remainingMin: 0, status: 'up' },
+      { key: 'ignite', timerMax: null, timerMin: null, remainingMax: 0, remainingMin: 0, status: 'up' },
+    ],
   }));
 
-  function getCDMax(i) {
-    const ah = state[i].ionicBoots ? BOOTS_AH : 0;
-    return Math.round(BASE_CD / (1 + ah / 100));
+  // ── Timer logic ────────────────────────────────────────────────────
+  function getCDMax(i, key) {
+    const cd = SPELL_CD[key] ?? 0;
+    if (!cd) return 0;
+    return Math.round(cd / (1 + state[i].bootsAH / 100));
   }
 
-  function getCDMin(i) {
-    const ah = COSMIC_AH + (state[i].ionicBoots ? BOOTS_AH : 0);
-    return Math.round(BASE_CD / (1 + ah / 100));
+  function getCDMin(i, key) {
+    const cd = SPELL_CD[key] ?? 0;
+    if (!cd) return 0;
+    return Math.round(cd / (1 + (COSMIC_AH + state[i].bootsAH) / 100));
   }
 
   function formatTime(s) {
     return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
   }
 
-  function startCD(i) {
-    if (state[i].timerMax) return;
+  function startCD(i, slot) {
+    const sp = state[i].spells[slot];
+    if (sp.timerMax || !SPELL_CD[sp.key]) return;
 
-    state[i].remainingMax = getCDMax(i);
-    state[i].remainingMin = getCDMin(i);
-    state[i].status = 'cd';
-    updateCard(i);
+    sp.remainingMax = getCDMax(i, sp.key);
+    sp.remainingMin = getCDMin(i, sp.key);
+    sp.status = 'cd';
+    updateSpellRow(i, slot);
 
-    state[i].timerMin = setInterval(() => {
-      state[i].remainingMin--;
-      if (state[i].remainingMin <= 0) {
-        clearInterval(state[i].timerMin);
-        state[i].timerMin = null;
-        state[i].remainingMin = 0;
-        if (state[i].status === 'cd') state[i].status = 'maybe';
+    sp.timerMin = setInterval(() => {
+      sp.remainingMin--;
+      if (sp.remainingMin <= 0) {
+        clearInterval(sp.timerMin);
+        sp.timerMin = null;
+        sp.remainingMin = 0;
+        if (sp.status === 'cd') sp.status = 'maybe';
       }
-      updateCard(i);
+      updateSpellRow(i, slot);
     }, 1000);
 
-    state[i].timerMax = setInterval(() => {
-      state[i].remainingMax--;
-      if (state[i].remainingMax <= 0) {
-        clearInterval(state[i].timerMax);
-        state[i].timerMax = null;
-        state[i].remainingMax = 0;
-        state[i].status = 'up';
+    sp.timerMax = setInterval(() => {
+      sp.remainingMax--;
+      if (sp.remainingMax <= 0) {
+        clearInterval(sp.timerMax);
+        sp.timerMax = null;
+        sp.remainingMax = 0;
+        sp.status = 'up';
       }
-      updateCard(i);
+      updateSpellRow(i, slot);
     }, 1000);
   }
 
-  function resetCD(i) {
-    clearInterval(state[i].timerMax);
-    clearInterval(state[i].timerMin);
-    state[i].timerMax = null;
-    state[i].timerMin = null;
-    state[i].remainingMax = 0;
-    state[i].remainingMin = 0;
-    state[i].status = 'up';
-    updateCard(i);
+  function resetCD(i, slot) {
+    const sp = state[i].spells[slot];
+    clearInterval(sp.timerMax);
+    clearInterval(sp.timerMin);
+    sp.timerMax = null;
+    sp.timerMin = null;
+    sp.remainingMax = 0;
+    sp.remainingMin = 0;
+    sp.status = 'up';
+    updateSpellRow(i, slot);
   }
 
-  function updateCard(i) {
-    const card     = document.getElementById(`card-${i}`);
-    const flashBtn = document.getElementById(`flash-btn-${i}`);
-    const resetBtn = document.getElementById(`reset-btn-${i}`);
-    const timeMax    = document.getElementById(`time-max-${i}`);
-    const timeMin    = document.getElementById(`time-min-${i}`);
-    const ciBox      = document.getElementById(`ci-box-${i}`);
-    const ciDivider  = document.getElementById(`ci-divider-${i}`);
+  function updateCIVisibility(i, slot) {
+    const sp    = state[i].spells[slot];
+    const ciBox = document.getElementById(`ci-box-${i}-${slot}`);
+    const ciDiv = document.getElementById(`ci-div-${i}-${slot}`);
+    const show  = state[i].cosmicInsight && !!SPELL_CD[sp.key];
+    ciBox.style.display = show ? '' : 'none';
+    ciDiv.style.display = show ? '' : 'none';
+  }
 
-    // Show/hide CI clock
-    const showCI = state[i].cosmicInsight;
-    ciBox.style.display     = showCI ? '' : 'none';
-    ciDivider.style.display = showCI ? '' : 'none';
+  function updateSpellRow(i, slot) {
+    const sp      = state[i].spells[slot];
+    const row     = document.getElementById(`spell-row-${i}-${slot}`);
+    const btn     = document.getElementById(`spell-btn-${i}-${slot}`);
+    const rstBtn  = document.getElementById(`reset-btn-${i}-${slot}`);
+    const timeMax = document.getElementById(`time-max-${i}-${slot}`);
+    const timeMin = document.getElementById(`time-min-${i}-${slot}`);
+    const noSpell = !SPELL_CD[sp.key];
 
-    card.className = `card ${state[i].status}`;
+    updateCIVisibility(i, slot);
+    row.className = `spell-row ${sp.status === 'cd' ? 'on-cd' : sp.status}`;
 
-    if (state[i].status === 'up') {
+    if (noSpell) {
+      timeMax.className = 'clock-time no-spell';
+      timeMax.textContent = '—';
+      timeMin.className = 'clock-time no-spell';
+      timeMin.textContent = '—';
+      btn.disabled = true;
+      rstBtn.style.display = 'none';
+    } else if (sp.status === 'up') {
       timeMax.className = 'clock-time up';
-      timeMax.textContent = 'LISTO';
+      timeMax.textContent = T.ui.ready;
       timeMin.className = 'clock-time up';
-      timeMin.textContent = 'LISTO';
-      flashBtn.disabled = false;
-      resetBtn.style.display = 'none';
-    } else if (state[i].status === 'maybe') {
+      timeMin.textContent = T.ui.ready;
+      btn.disabled = false;
+      rstBtn.style.display = 'none';
+    } else if (sp.status === 'maybe') {
       timeMax.className = 'clock-time ticking-max';
-      timeMax.textContent = formatTime(state[i].remainingMax);
+      timeMax.textContent = formatTime(sp.remainingMax);
       timeMin.className = 'clock-time done-min';
-      timeMin.textContent = '¿LISTO?';
-      flashBtn.disabled = true;
-      resetBtn.style.display = 'inline-block';
+      timeMin.textContent = T.ui.maybeReady;
+      btn.disabled = true;
+      rstBtn.style.display = 'inline-block';
     } else {
       timeMax.className = 'clock-time ticking-max';
-      timeMax.textContent = formatTime(state[i].remainingMax);
+      timeMax.textContent = formatTime(sp.remainingMax);
       timeMin.className = 'clock-time ticking-min';
-      timeMin.textContent = formatTime(state[i].remainingMin);
-      flashBtn.disabled = true;
-      resetBtn.style.display = 'inline-block';
+      timeMin.textContent = formatTime(sp.remainingMin);
+      btn.disabled = true;
+      rstBtn.style.display = 'inline-block';
     }
   }
 
-  // ── Voice ────────────────────────────────────────────────────────
-
+  // ── Voice ──────────────────────────────────────────────────────────
   function setVoiceStatus(text, highlight) {
     const el = document.getElementById('voice-status');
     el.innerHTML = highlight
-      ? `Escuché: <span>${highlight}</span> — ${text}`
+      ? `Escuché / Heard: <span>${highlight}</span> — ${text}`
       : text;
   }
 
@@ -480,15 +660,24 @@
       .replace(/[^a-z0-9 ]/g, '');
   }
 
+  function detectSpell(raw) {
+    const p = phonetic(raw);
+    for (const [word, spell] of Object.entries(T.voiceSpells)) {
+      if (p.includes(phonetic(word))) return spell;
+    }
+    return null;
+  }
+
   function handleVoiceCommand(transcript) {
     const raw = transcript.toLowerCase().trim();
-    setVoiceStatus('procesando...', raw);
+    setVoiceStatus(T.ui.voiceProcessing, raw);
 
-    const isReset = /\breset\b/.test(raw);
-    const isFlash = !isReset;
+    const isReset       = /\breset\b/.test(raw);
+    const detectedSpell = detectSpell(raw);
+    const targets       = new Set();
+    const allVoiceWords = { ...T.voiceNums, ...T.voiceRoles };
 
-    const targets = new Set();
-
+    // Match digits
     for (const m of raw.matchAll(/\d+/g)) {
       for (const ch of m[0]) {
         const n = parseInt(ch);
@@ -496,49 +685,64 @@
       }
     }
 
-    const rawPhonetic = phonetic(raw);
-    for (const [word, num] of Object.entries(WORD_TO_NUM)) {
-      if (rawPhonetic.includes(phonetic(word))) targets.add(num - 1);
+    // Match role/number words
+    const rawP = phonetic(raw);
+    for (const [word, num] of Object.entries(allVoiceWords)) {
+      if (rawP.includes(phonetic(word))) targets.add(num - 1);
     }
 
-    const cleaned = phonetic(raw.replace(/\bflash\b|\breset\b/g, '').trim());
-    const cleanedNoSpaces = cleaned.replace(/\s/g, '');
+    // Match champion names
+    const cleaned = phonetic(raw.replace(SPELL_STRIP_RE, '').trim());
     if (cleaned.length > 1) {
       for (let i = 0; i < 5; i++) {
         const name = phonetic(state[i].name.trim());
-        const nameNoSpaces = name.replace(/\s/g, '');
-        if (name && (cleaned.includes(name) || cleanedNoSpaces.includes(nameNoSpaces))) targets.add(i);
+        if (name && cleaned.includes(name)) targets.add(i);
       }
     }
 
     if (targets.size === 0) {
-      setVoiceStatus('no entendí el slot', raw);
+      setVoiceStatus(T.ui.voiceNoSlot, raw);
       return;
     }
 
-    const labels = [...targets].map(i => ROLES[i]).join(', ');
-    if (isFlash) {
-      targets.forEach(i => startCD(i));
-      setVoiceStatus(`flash activado: ${labels}`, raw);
-    } else {
-      targets.forEach(i => resetCD(i));
-      setVoiceStatus(`reset: ${labels}`, raw);
-    }
+    const labels = [];
+    targets.forEach(i => {
+      let slot = null;
+      if (detectedSpell) {
+        if (state[i].spells[0].key === detectedSpell) slot = 0;
+        else if (state[i].spells[1].key === detectedSpell) slot = 1;
+      }
+      if (slot === null) {
+        slot = state[i].spells[0].key === 'flash' ? 0
+             : state[i].spells[1].key === 'flash' ? 1
+             : 0;
+      }
+      if (isReset) resetCD(i, slot);
+      else startCD(i, slot);
+      const spellLabel = T.spells[state[i].spells[slot].key] ?? '?';
+      labels.push(`${T.roles[i]} (${spellLabel})`);
+    });
+
+    const spellName = detectedSpell ? T.spells[detectedSpell] : T.spells['flash'];
+    setVoiceStatus(
+      isReset ? T.ui.voiceReset(labels.join(', ')) : T.ui.voiceUsed(spellName, labels.join(', ')),
+      raw
+    );
   }
 
   let recognition = null;
-  let listening = false;
+  let listening   = false;
 
   function setupVoice() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) {
       document.getElementById('mic-btn').disabled = true;
-      setVoiceStatus('Tu navegador no soporta reconocimiento de voz (usa Chrome/Edge)');
+      setVoiceStatus(T.ui.voiceNoSupport);
       return;
     }
 
     recognition = new SR();
-    recognition.lang = 'es-ES';
+    recognition.lang = T.speechLang;
     recognition.continuous = true;
     recognition.interimResults = false;
 
@@ -546,12 +750,10 @@
       const transcript = e.results[e.results.length - 1][0].transcript;
       handleVoiceCommand(transcript);
     };
-
     recognition.onerror = (e) => {
       if (e.error === 'no-speech') return;
-      setVoiceStatus(`Error: ${e.error}`);
+      setVoiceStatus(T.ui.voiceError(e.error));
     };
-
     recognition.onend = () => { if (listening) recognition.start(); };
 
     document.getElementById('mic-btn').addEventListener('click', () => {
@@ -559,71 +761,157 @@
         listening = true;
         recognition.start();
         document.getElementById('mic-btn').classList.add('listening');
-        setVoiceStatus('Escuchando... di "flash top", "mid", "flash Jinx", "reset adc"');
+        setVoiceStatus(T.ui.voiceListening);
       } else {
         listening = false;
         recognition.stop();
         document.getElementById('mic-btn').classList.remove('listening');
-        setVoiceStatus('Voz desactivada — presiona el micrófono');
+        setVoiceStatus(T.ui.voiceOff);
       }
     });
   }
 
-  // ── Board ────────────────────────────────────────────────────────
-
+  // ── Board ──────────────────────────────────────────────────────────
   function buildBoard() {
     const board = document.getElementById('board');
     board.innerHTML = '';
 
     for (let i = 0; i < 5; i++) {
       const card = document.createElement('div');
-      card.className = 'card ready';
+      card.className = 'card';
       card.id = `card-${i}`;
 
-      card.innerHTML = `
-        <div class="slot-number"><span class="slot-num">${i + 1}</span> ${ROLES[i]}</div>
-
-        <input class="name-input" type="text" placeholder="Campeón" id="name-${i}" maxlength="16" />
-
+      const header = document.createElement('div');
+      header.className = 'card-header';
+      header.innerHTML = `
+        <div class="slot-number" id="slot-num-${i}"><span class="slot-num">${i + 1}</span> ${T.roles[i]}</div>
+        <input class="name-input" type="text" placeholder="${T.ui.champPlaceholder}" id="name-${i}" maxlength="16" />
         <div class="checkboxes">
-          <label class="boots-label">
-            <input type="checkbox" id="ib-${i}" /> Botas Jónicas
+          <label class="check-label">
+            <select class="boots-sel" id="boots-sel-${i}">
+              <option value="0">${T.ui.bootsNone}</option>
+              <option value="${BOOTS_AH}">${T.ui.bootsRegular}</option>
+              <option value="${BOOTS_UPGRADED_AH}">${T.ui.bootsUpgraded}</option>
+            </select>
           </label>
-          <label class="boots-label">
-            <input type="checkbox" id="ci-${i}" /> Cosmic Insight
-          </label>
+          <label class="check-label"><input type="checkbox" id="ci-${i}" /> Cosmic Insight</label>
         </div>
-
-        <button class="flash-btn" id="flash-btn-${i}">⚡ Flash usado</button>
-
-        <div class="clocks">
-          <div class="clock-box" id="ci-box-${i}">
-            <div class="clock-label">Con CI</div>
-            <div class="clock-time up" id="time-min-${i}">LISTO</div>
-          </div>
-          <div class="clock-divider" id="ci-divider-${i}"></div>
-          <div class="clock-box">
-            <div class="clock-label">Sin CI</div>
-            <div class="clock-time up" id="time-max-${i}">LISTO</div>
-          </div>
-        </div>
-
-        <button class="reset-btn" id="reset-btn-${i}" style="display:none">Reset</button>
       `;
+      card.appendChild(header);
+
+      for (let s = 0; s < 2; s++) {
+        const row = document.createElement('div');
+        row.className = 'spell-row up';
+        row.id = `spell-row-${i}-${s}`;
+
+        const opts = SPELL_ORDER.map(k =>
+          `<option value="${k}"${state[i].spells[s].key === k ? ' selected' : ''}>${T.spells[k]}</option>`
+        ).join('');
+
+        row.innerHTML = `
+          <div class="spell-slot-label">${s === 0 ? 'D' : 'F'}</div>
+          <select class="spell-select" id="spell-sel-${i}-${s}">${opts}</select>
+          <button class="spell-btn" id="spell-btn-${i}-${s}">${T.ui.spellBtn}</button>
+          <div class="clocks">
+            <div class="clock-box" id="ci-box-${i}-${s}" style="display:none">
+              <div class="clock-label" id="ci-clk-lbl-${i}-${s}">${T.ui.conCI}</div>
+              <div class="clock-time up" id="time-min-${i}-${s}">${T.ui.ready}</div>
+            </div>
+            <div class="clock-divider" id="ci-div-${i}-${s}" style="display:none"></div>
+            <div class="clock-box">
+              <div class="clock-label" id="no-ci-clk-lbl-${i}-${s}">${T.ui.sinCI}</div>
+              <div class="clock-time up" id="time-max-${i}-${s}">${T.ui.ready}</div>
+            </div>
+          </div>
+          <button class="reset-btn" id="reset-btn-${i}-${s}" style="display:none">Reset</button>
+        `;
+
+        card.appendChild(row);
+      }
 
       board.appendChild(card);
 
-      document.getElementById(`flash-btn-${i}`).addEventListener('click', () => startCD(i));
-      document.getElementById(`reset-btn-${i}`).addEventListener('click', () => resetCD(i));
-      document.getElementById(`ib-${i}`).addEventListener('change', (e) => { state[i].ionicBoots = e.target.checked; });
-      document.getElementById(`ci-${i}`).addEventListener('change', (e) => { state[i].cosmicInsight = e.target.checked; updateCard(i); });
-      document.getElementById(`name-${i}`).addEventListener('input', (e) => { state[i].name = e.target.value; });
-      updateCard(i);
+      // Events — after board.appendChild so getElementById works
+      for (let s = 0; s < 2; s++) {
+        document.getElementById(`spell-btn-${i}-${s}`)
+          .addEventListener('click', () => startCD(i, s));
+        document.getElementById(`reset-btn-${i}-${s}`)
+          .addEventListener('click', () => resetCD(i, s));
+        document.getElementById(`spell-sel-${i}-${s}`)
+          .addEventListener('change', (e) => {
+            resetCD(i, s);
+            state[i].spells[s].key = e.target.value;
+            updateSpellRow(i, s);
+          });
+      }
+
+      document.getElementById(`boots-sel-${i}`).addEventListener('change', (e) => {
+        state[i].bootsAH = parseInt(e.target.value);
+      });
+      document.getElementById(`ci-${i}`).addEventListener('change', (e) => {
+        state[i].cosmicInsight = e.target.checked;
+        updateCIVisibility(i, 0);
+        updateCIVisibility(i, 1);
+      });
+      document.getElementById(`name-${i}`).addEventListener('input', (e) => {
+        state[i].name = e.target.value;
+      });
     }
   }
 
+  // ── Language ───────────────────────────────────────────────────────
+  function applyTranslations() {
+    const ui = T.ui;
+    document.documentElement.lang = lang;
+    document.getElementById('voice-hint').textContent = ui.voiceHint;
+    document.getElementById('footer').textContent     = ui.footer;
+    if (!listening) setVoiceStatus(ui.voiceOff);
+
+    for (let i = 0; i < 5; i++) {
+      document.getElementById(`slot-num-${i}`).innerHTML =
+        `<span class="slot-num">${i + 1}</span> ${T.roles[i]}`;
+      document.getElementById(`name-${i}`).placeholder = ui.champPlaceholder;
+      const bootsSel = document.getElementById(`boots-sel-${i}`);
+      bootsSel.options[0].textContent = ui.bootsNone;
+      bootsSel.options[1].textContent = ui.bootsRegular;
+      bootsSel.options[2].textContent = ui.bootsUpgraded;
+
+      for (let s = 0; s < 2; s++) {
+        document.getElementById(`spell-btn-${i}-${s}`).textContent     = ui.spellBtn;
+        document.getElementById(`ci-clk-lbl-${i}-${s}`).textContent    = ui.conCI;
+        document.getElementById(`no-ci-clk-lbl-${i}-${s}`).textContent = ui.sinCI;
+
+        const sel = document.getElementById(`spell-sel-${i}-${s}`);
+        SPELL_ORDER.forEach(k => {
+          const opt = sel.querySelector(`option[value="${k}"]`);
+          if (opt) opt.textContent = T.spells[k];
+        });
+
+        updateSpellRow(i, s);
+      }
+    }
+
+    if (recognition) recognition.lang = T.speechLang;
+  }
+
+  function setLanguage(l) {
+    lang = l;
+    T    = LANGS[l];
+    buildSpellRE();
+    document.querySelectorAll('.lang-btn').forEach(btn =>
+      btn.classList.toggle('active', btn.dataset.lang === l)
+    );
+    applyTranslations();
+  }
+
+  // ── Init ───────────────────────────────────────────────────────────
   buildBoard();
   setupVoice();
+  applyTranslations();
+
+  document.querySelectorAll('.lang-btn').forEach(btn =>
+    btn.addEventListener('click', () => setLanguage(btn.dataset.lang))
+  );
 </script>
 
 </body>

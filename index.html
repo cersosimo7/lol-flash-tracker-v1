@@ -105,11 +105,17 @@
       font-size: 0.72rem;
       font-weight: bold;
       color: #785a28;
-      width: 62px;
+      width: 80px;
       flex-shrink: 0;
       text-align: center;
       letter-spacing: 1px;
       text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .slot-num {
+      color: #4a7aaa;
+      font-size: 0.85rem;
     }
 
     .name-input {
@@ -247,7 +253,7 @@
 
       .card {
         display: grid;
-        grid-template-columns: 46px 1fr auto auto;
+        grid-template-columns: 80px 1fr auto auto;
         grid-template-rows: auto auto;
         column-gap: 8px;
         row-gap: 8px;
@@ -575,7 +581,7 @@
       card.id = `card-${i}`;
 
       card.innerHTML = `
-        <div class="slot-number">${ROLES[i]}</div>
+        <div class="slot-number"><span class="slot-num">${i + 1}</span> ${ROLES[i]}</div>
 
         <input class="name-input" type="text" placeholder="Campeón" id="name-${i}" maxlength="16" />
 
